@@ -8,7 +8,7 @@ from json.decoder import JSONDecodeError
 from os import system, name
 
 # print(json.dumps(searchResults, sort_keys=True, indent=4))
-
+# spotify:user:1251475457
 
 def printPlaylists(playlists) :
     # clear()
@@ -59,7 +59,11 @@ def playlistDataAnalysis(playlists, tPlaylists, tTracks):
             print(str(trackIndex) + "/" + str(tTracks) + " tracks")
             # print(track['track']['name'])
             f = open("demofile.txt", "a")
-            f.write(str(track["track"]["name"]))
+            try: 
+                print((str(track["track"]["name"]) + ", " + str(track["track"]["album"]["artists"][0]["name"])).encode('utf8'))
+            except:
+                print("Shit's fucked yo")
+            # f.write("\n" + str(track["track"]["name"]) + "," + str(track["track"]["album"]["artists"][0]["name"]))
         #print(json.dumps(tracks, sort_keys=True, indent=4))
 
 def clear():
