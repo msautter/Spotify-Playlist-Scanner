@@ -14,14 +14,16 @@ def clear():
     else:
         _ = system('clear')
 
-def exitProgram() :
+def exitProgram():
     print("Thank you for using Spotipy Playlist Scanner")
     exit()
 
-def printTracks(tracks):
+def printTracks(tracks, pId, pName):
     for i, item in enumerate(tracks['items']):
+        global tempIndex
         tempIndex += 1
         track = item['track']
+        listOfTracks.append(Track(removeEmojis(track['name']), track["id"], pId, pName, track['explicit'], track['release_date'], track['duration_ms']))
         print("<<{}>> {}, {}".format(tempIndex, removeEmojis(track['artists'][0]['name']), removeEmojis(track['name'])))
 
 def removeEmojis(arg):
@@ -30,14 +32,24 @@ def removeEmojis(arg):
 
 fileName = ""
 listOfPlaylists = []
+listOfTracks = []
 
 class Playlist(object):
-    def __init__(self, name=None, URI=None, uURI=None, total=None):
+    def __init__(self, name=None, uri=None, uURI=None, total=None):
         self.name = name
-        self.URI = URI
+        self.uri = uri
         self.uURI = uURI
         self.total = total
 
+class Track(object):
+    def __init__(self, name=None, uri=None, pURI=None, pName=None, explicit=None, releaseDate=None, duration=None):
+        self.name = name
+        self.uri = uri
+        self.pURI = pURI
+        self.pName = pName
+        self.explicit = explicit
+        self.releaseDate = releaseDate
+        self.duration = duration
 
 # Get username from terminal
 username = sys.argv[1]
@@ -69,9 +81,9 @@ if searchResults['playlists']['total'] == 0:
     print("Sorry, that value did not return any playlists.")
     input()
     exitProgram()
-searchResults2 = spotifyObject.search(searchQuery,50,50,"playlist")
-playlists = searchResults['playlists']['items']
-playlists += searchResults2['playlists']['items']
+# searchResults2 = spotifyObject.search(searchQuery,50,50,"playlist")
+# playlists = searchResults['playlists']['items']
+# playlists += searchResults2['playlists']['items']
 totalPlaylists = 0
 totalTracks = 0
 for item in playlists:
@@ -103,19 +115,20 @@ tempIndex = 0
 
 choice = input("Would you like to print tracks to a file? (y/n)")
 if choice == 'y':
-    # fileName = input("What would you like to name the file (.csv)? ")
-    # with open(fileName, 'w', newline=' ') as csvfile:
-        # spamwriter = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-    testSearchResults = spotifyObject.search(searchQuery,50,0,"playlist")
-    newIndex = 0
-    for playlist in listOfPlaylists:
-        results = spotifyObject.user_playlist(playlist.uURI, playlist.URI, fields="tracks, next")
-        tracks = results['tracks']
-        printTracks(tracks)
-        while tracks['next']:
-            tracks = spotifyObject.next(tracks)
-            printTracks(tracks)
-    input("DONE")
+    fileName = input("What would you like to name the file (.csv)? ")
+    with open(fileName, 'w', newline=' ') as csvfile:
+        pamwriter = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        newIndex = 0
+        testSearchResults = spotifyObject.search(searchQuery,50,0,"playlist")
+        for playlist in listOfPlaylists:
+
+            results = spotifyObject.user_playlist(playlist.uURI, playlist.uri, fields="tracks, next")
+            tracks = results['tracks']
+            printTracks(tracks, playlist.uri, playlist.name)
+            while tracks['next']:
+                tracks = spotifyObject.next(tracks)
+                printTracks(tracks, playlist.uri, playlist.name)
+        input("DONE")
             # print (str(playlist['name']))
             # print ('total tracks: ' + str(playlist['tracks']['total']))
             # results = spotifyObject.user_playlist()
