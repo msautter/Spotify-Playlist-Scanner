@@ -8,6 +8,7 @@ from json.decoder import JSONDecodeError
 from os import system, name
 import csv
 
+
 def clear():
     if name == 'nt':
         _ = system('cls')
@@ -21,18 +22,24 @@ def exitProgram():
 def printTracks(tracks, pId, pName):
     for i, item in enumerate(tracks['items']):
         global tempIndex
-        global spamwriter
+        global trackWriter
         tempIndex += 1
         track = item['track']
         # , track['album']['images'][0]['url']
         # listOfTracks.append(Track(removeEmojis(track['name']), track["id"], pId, pName, track['explicit'], track['album']['release_date'], track['duration_ms']))
-        spamwriter.writerow([ str(removeEmojis(track['name'])), str(track["id"]), str(pId), str(pName), str(track['explicit']), str(track['album']['release_date']), str(track['duration_ms']) ])
-        print("<<{}>> {}, {}, {}, {}".format(tempIndex, removeEmojis(track['artists'][0]['name']), removeEmojis(track['name']), pId, pName))
+        #spamwriter.writerow([ str(removeEmojis(track['name'])), str(track["id"]), str(pId), str(pName), str(track['explicit']), str(track['album']['release_date']), str(track['duration_ms']) ])
+        try:
+            print("<<{}>> {}, {}, {}, {}".format(tempIndex, removeEmojis(track['artists'][0]['name']), removeEmojis(track['name']), pId, pName))
+            trackWriter.writerow([ str(removeEmojis(track['name'])), str(track["id"]), str(pId), str(pName), str(track['explicit']), str(track['album']['release_date']), str(track['duration_ms']) ])
+        except:
+            global mistakes
+            mistakes+=1
+            print("<<{}>> TRACK NOT ADDED --------------------------------------".format(tempIndex))
 
 def removeEmojis(arg):
     return (str((arg).encode('utf-8', 'ignore')))[1:]
 
-
+mistakes = 0
 fileName = ""
 listOfPlaylists = []
 listOfTracks = []
@@ -57,7 +64,6 @@ class Track(object):
 
 # Get username from terminal
 username = sys.argv[1]
-
 # Erase cache and prompt for user permission
 try:
     token = util.prompt_for_user_token(username)
@@ -120,9 +126,12 @@ tempIndex = 0
 choice = input("Would you like to print tracks to a file? (y/n)")
 if choice == 'y':
     fileName = input("What would you like to name the file (.csv)? ")
-    with open(fileName, 'w', newline='') as csvfile:
-        spamwriter = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+    if fileName[-4:] != '.csv':
+        fileName += '.csv'
+    with open(fileName, mode='w') as trackWriter:
+        trackWriter = csv.writer(trackWriter, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         newIndex = 0
+        trackWriter.writerow(['track', 'track id', 'playlist id', 'playlist name', 'explicit', 'release date', 'duration'])
         for playlist in listOfPlaylists:
             results = spotifyObject.user_playlist(playlist.uURI, playlist.uri, fields="tracks, next")
             tracks = results['tracks']
@@ -130,7 +139,11 @@ if choice == 'y':
             while tracks['next']:
                 tracks = spotifyObject.next(tracks)
                 printTracks(tracks, playlist.uri, playlist.name)
-        input("DONE")
+if choice == 'n':
+    input("Thank you for using the Spotify Playlist Scanner CLI")
+    exitProgram()
+input("Number of mistakes: " + str(mistakes))
+exitProgram()
         # print (str(playlist['name']))
         # print ('total tracks: ' + str(playlist['tracks']['total']))
         # results = spotifyObject.user_playlist()
