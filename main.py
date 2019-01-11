@@ -25,12 +25,13 @@ def printTracks(tracks, pId, pName):
         global trackWriter
         tempIndex += 1
         track = item['track']
-        # , track['album']['images'][0]['url']
-        # listOfTracks.append(Track(removeEmojis(track['name']), track["id"], pId, pName, track['explicit'], track['album']['release_date'], track['duration_ms']))
-        #spamwriter.writerow([ str(removeEmojis(track['name'])), str(track["id"]), str(pId), str(pName), str(track['explicit']), str(track['album']['release_date']), str(track['duration_ms']) ])
         try:
             print("<<{}>> {}, {}, {}, {}".format(tempIndex, removeEmojis(track['artists'][0]['name']), removeEmojis(track['name']), pId, pName))
-            trackWriter.writerow([ str(removeEmojis(track['name'])), str(track["id"]), str(pId), str(pName), str(track['explicit']), str(track['album']['release_date']), str(track['duration_ms']) ])
+            trackWriter.writerow([ str(removeEmojis(track['name'])), str(track["id"]), str(pId), str(pName), int(track['explicit']), str(track['album']['release_date']), str(track['duration_ms']) ])
+            if str(removeEmojis(track['id'])) in hashTable:
+                hashTable[str(removeEmojis(track['id']))] = hashTable[str(removeEmojis(track['id']))].value()+1
+            else:
+                hashTable[str(removeEmojis(track['id']))] = 0
         except:
             global mistakes
             mistakes+=1
@@ -43,6 +44,7 @@ mistakes = 0
 fileName = ""
 listOfPlaylists = []
 listOfTracks = []
+hashTable = {}
 
 class Playlist(object):
     def __init__(self, name=None, uri=None, uURI=None, total=None, image=None):
@@ -126,6 +128,10 @@ tempIndex = 0
 choice = input("Would you like to print tracks to a file? (y/n)")
 if choice == 'y':
     fileName = input("What would you like to name the file (.csv)? ")
+    if fileName == '':
+        fileName = searchQuery.replace(" ", "-")
+        fileName += "-uncompressed"
+        print(fileName)
     if fileName[-4:] != '.csv':
         fileName += '.csv'
     with open(fileName, mode='w') as trackWriter:
@@ -139,6 +145,10 @@ if choice == 'y':
             while tracks['next']:
                 tracks = spotifyObject.next(tracks)
                 printTracks(tracks, playlist.uri, playlist.name)
+
+choice = input("Would you like to print the hash table?")
+print(hashTable)
+
 if choice == 'n':
     input("Thank you for using the Spotify Playlist Scanner CLI")
     exitProgram()
