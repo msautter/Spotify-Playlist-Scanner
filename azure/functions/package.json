@@ -1,0 +1,20 @@
+{
+  "name": "spotify-playlist-scanner",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "prestart": "npm run build",
+    "start": "func start",
+    "test": "echo \"No tests yet...\""
+  },
+  "dependencies": {
+    "axios": "^0.19.2",
+    "firebase-admin": "^8.9.2"
+  },
+  "devDependencies": {
+    "@azure/functions": "^1.2.0",
+    "typescript": "^3.3.3"
+  }
+}
