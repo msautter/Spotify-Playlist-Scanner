@@ -1,0 +1,16 @@
+{
+  "name": "spotify-playlist-scanner-cli",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start" : "tsc && node ./dist/index.js"
+  },
+  "author": "masautt",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^13.7.1",
+    "typescript": "^3.7.5"
+  }
+}
