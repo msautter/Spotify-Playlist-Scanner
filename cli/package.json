@@ -5,12 +5,18 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start" : "tsc && node ./dist/index.js"
+    "start": "tsc && node ./dist/index.js"
   },
   "author": "masautt",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^13.7.1",
+    "@types/table": "^4.0.7",
+    "dotenv": "^8.2.0",
     "typescript": "^3.7.5"
+  },
+  "dependencies": {
+    "axios": "^0.19.2",
+    "table": "^5.4.6"
   }
 }
